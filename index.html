@@ -43,7 +43,7 @@
     .tick:last-child:before{background:var(--panel)}
     .tick strong{display:block;color:var(--ink);font-size:15px}
     .roster-scroll{overflow-x:auto;padding:0 22px 24px}
-    .roster{min-width:920px;display:grid;grid-template-columns:92px repeat(5,minmax(150px,1fr));grid-template-rows:52px repeat(14,64px);position:relative;border:1px solid var(--line);background:#181b19}
+    .roster{min-width:920px;display:grid;grid-template-columns:92px repeat(5,minmax(150px,1fr));grid-template-rows:52px repeat(15,64px);position:relative;border:1px solid var(--line);background:#181b19}
     .roster:before{content:"";position:absolute;left:92px;right:0;top:52px;bottom:0;background:repeating-linear-gradient(to bottom,transparent 0,transparent 63px,var(--line) 63px,var(--line) 64px);pointer-events:none}
     .roster-corner,.roster-head{display:grid;place-items:center;background:#202521;border-right:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--gold2);font-family:"Songti SC",serif;font-size:16px;position:sticky;top:0;z-index:4}
     .roster-corner{grid-column:1;grid-row:1;left:0;z-index:6;font-family:inherit;font-size:12px;color:var(--muted)}
@@ -112,7 +112,7 @@
       <div class="panel-head"><h2>游戏日与方案</h2><small>每日本地时间 08:00 切换游戏日</small></div>
       <div class="control-panel">
         <div class="control"><label for="gameDate">查看 / 补打卡日期</label><input id="gameDate" type="date"></div>
-        <div class="control"><label for="templateSelect">当日远征模板</label><select id="templateSelect"><option value="daily">70 万冲刺版</option><option value="sprint85">85 万冲刺模板（未定义）</option><option value="sprint100">100 万冲刺模板（未定义）</option></select></div>
+        <div class="control"><label for="templateSelect">当日远征模板</label><select id="templateSelect"><option value="sprint70">70w冲刺</option><option value="daily">100w冲刺</option></select></div>
         <div class="control"><label for="targetSelect">资源目标</label><select id="targetSelect"><option value="700000">70 万</option><option value="850000">85 万</option><option value="1000000">100 万</option></select></div>
         <div class="control"><label for="dailySetting">日课（每项资源）</label><input id="dailySetting" type="number" min="0" step="1"></div>
         <div class="control"><label for="monthlySetting">月卡（每项资源）</label><input id="monthlySetting" type="number" min="0" step="1"></div>
@@ -129,10 +129,10 @@
 
     <div class="grid">
       <section class="panel">
-        <div class="panel-head"><h2>每日刷花</h2><small>最低刀种需求 · 合计 17 把</small></div>
+        <div class="panel-head"><h2>每日刷花</h2><small id="flowerMeta">最低刀种需求 · 合计 17 把</small></div>
         <div class="flower">
-          <div class="flower-row"><div class="flower-item"><span>太刀</span><strong>2</strong></div><div class="flower-item"><span>大太刀</span><strong>1</strong></div><div class="flower-item"><span>自由刀种</span><strong>14</strong></div><div class="flower-item"><span>合计</span><strong>17</strong></div></div>
-          <div class="flower-total">至少需要：<b>太刀 2 · 大太刀 1；第五队再增加 3 把自由刀种，共 17 把</b></div>
+          <div class="flower-row"><div class="flower-item"><span>太刀</span><strong>2</strong></div><div class="flower-item"><span>大太刀</span><strong>1</strong></div><div class="flower-item"><span>自由刀种</span><strong id="flowerFree">14</strong></div><div class="flower-item"><span>合计</span><strong id="flowerTotal">17</strong></div></div>
+          <div class="flower-total">至少需要：<b id="flowerNote">太刀 2 · 大太刀 1；其余 14 把可自由选择刀种</b></div>
         </div>
       </section>
       <section class="panel">
@@ -170,7 +170,7 @@
       '4-1':[0,120,150,90,0,1,0],'4-3':[150,300,750,0,0,0,2],
       '4-4':[225,0,0,600,700,0,0],'5-1':[375,375,375,0,0,0,2]
     };
-    const times=['08','10','11','12','14','16','17','18','20','21:30','22','次日04','次日05:30','次日06','次日08'];
+    const times=['08','10','11','12','14','16','17','18','20','21:30','22','次日02','次日04','次日05:30','次日06','次日08'];
     const dailyTeams=[
       {name:'队 1',slots:{'08':['2-3','太刀A','exp-001'],'10':['2-3','太刀A','exp-005'],'12':['2-3','太刀A','exp-007'],'14':['2-3','太刀A','exp-009'],'16':['2-3','太刀B','exp-012'],'18':['5-1','太刀B + C + D','exp-015']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'次日06'}},
       {name:'队 2',slots:{'08':['3-1','A + B','exp-002'],'12':['3-1','A + B','exp-008'],'16':['4-1','A + B','exp-013'],'18':['4-3','A + B + C','exp-016']},receives:{'08':'12','12':'16','16':'18','18':'次日06'}},
@@ -178,10 +178,16 @@
       {name:'队 4',slots:{'08':['4-4','A + B + C','exp-004'],'14':['4-4','A + B + C','exp-011'],'20':['3-3','A + B','exp-018']},receives:{'08':'14','14':'20','20':'次日06'}},
       {name:'队 5',slots:{'22':['4-4','A + B + C','exp-020']},receives:{'22':'次日04'}}
     ];
-    const templates={daily:{name:'70 万冲刺版',teams:dailyTeams},sprint85:{name:'85 万冲刺模板'},sprint100:{name:'100 万冲刺模板'}};
+    const sprint70Teams=[
+      {name:'队 1',slots:{'08':['2-3','太刀A','p70-001'],'10':['2-3','太刀A','p70-002'],'12':['2-3','太刀A','p70-003'],'14':['2-3','太刀B','p70-004'],'16':['2-3','太刀B','p70-005'],'18':['2-3','太刀B','p70-006'],'20':['2-3','太刀C','p70-007'],'22':['3-1','A + B','p70-008']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'20','20':'22','22':'次日02'}},
+      {name:'队 2',slots:{'08':['4-1','A + B','p70-009'],'10':['4-1','A + B','p70-010'],'12':['4-1','C + D','p70-011'],'14':['4-1','C + D','p70-012'],'16':['4-1','E + F','p70-013'],'18':['4-1','E + F','p70-014'],'20':['4-1','G + H','p70-015'],'22':['3-3','I + J','p70-016']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'20','20':'22','22':'次日08'}},
+      {name:'队 3',slots:{'08':['3-2','大太刀A + B','p70-017'],'11':['3-2','大太刀A + B','p70-018'],'14':['3-1','C + D','p70-019'],'18':['3-1','C + D','p70-020'],'22':['3-4','E + F','p70-021']},receives:{'08':'11','11':'14','14':'18','18':'22','22':'次日06'}},
+      {name:'队 4',slots:{'08':['3-1','A + B','p70-022'],'12':['4-4','A + B + C','p70-023'],'18':['5-1','A + B + C','p70-024']},receives:{'08':'12','12':'18','18':'次日06'}},
+      {name:'队 5',slots:{'22':['4-4','A + B + C','p70-025']},receives:{'22':'次日04'}}
+    ];
+    const templates={sprint70:{name:'70w冲刺',teams:sprint70Teams},daily:{name:'100w冲刺',teams:dailyTeams},sprint85:{name:'85 万冲刺模板'},sprint100:{name:'100 万冲刺模板（旧占位）'}};
     const legacyTaskIds={'08-1':'exp-001','08-2':'exp-002','08-3':'exp-003','08-4':'exp-004','10-1':'exp-005','11-3':'exp-006','12-1':'exp-007','12-2':'exp-008','14-1':'exp-009','14-3':'exp-010','14-4':'exp-011','16-1':'exp-012','16-2':'exp-013','17-3':'exp-014','18-1':'exp-015','18-2':'exp-016','20-3':'exp-017','20-4':'exp-018','21:30-3':'exp-019'};
-    const templateTaskIds={daily:new Set(dailyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),sprint85:new Set(),sprint100:new Set()};
-    document.querySelector('#templateSelect option[value="daily"]').textContent=templates.daily.name;
+    const templateTaskIds={sprint70:new Set(sprint70Teams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),daily:new Set(dailyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),sprint85:new Set(),sprint100:new Set()};
     const defaultState=()=>({version:4,baseline:[450000,460000,430000,480000],rewardAnchor:[0,0,0,0],target:700000,settings:{dailyPerResource:2050,monthlyPerResource:900},days:{}});
     const pad=n=>String(n).padStart(2,'0');
     const formatDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -201,12 +207,11 @@
     function setStatus(message,error=false){const el=document.querySelector('#status');el.textContent=message;el.style.color=error?'#e3a49a':''}
     try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);state=validState(parsed);migratedOnLoad=parsed.version!==4}}catch(error){storageAvailable=false;setTimeout(()=>setStatus(`已使用安全默认值：${error.message}`,true))}
     let selectedDate=gameDay();
-    function dayState(){const day=state.days[selectedDate]||(state.days[selectedDate]={template:'daily',checks:{daily:[]},dailyAmount:null,monthlyAmount:null,adjustments:[0,0,0,0]});if(!day.checks)day.checks={daily:[]};if(!day.checks[day.template])day.checks[day.template]=[];if(!Array.isArray(day.adjustments))day.adjustments=[0,0,0,0];return day}
+    function dayState(){const day=state.days[selectedDate]||(state.days[selectedDate]={template:'sprint70',checks:{sprint70:[]},dailyAmount:null,monthlyAmount:null,adjustments:[0,0,0,0]});if(!day.checks)day.checks={};if(!day.checks[day.template])day.checks[day.template]=[];if(!Array.isArray(day.adjustments))day.adjustments=[0,0,0,0];return day}
     function save({backup=true}={}){try{const current=localStorage.getItem(STORAGE_KEY);if(backup&&current)localStorage.setItem(BACKUP_KEY,current);localStorage.setItem(STORAGE_KEY,JSON.stringify(state));storageAvailable=true;setStatus('已保存在当前设备')}catch(error){storageAvailable=false;setStatus('无法写入本地存储，请立即导出 JSON 备份',true)}}
     if(migratedOnLoad)save();
     function buildTasks(templateId){const teams=templates[templateId].teams||[];const tasks=[];times.forEach(time=>teams.forEach((team,teamIndex)=>{const slot=team.slots[time];if(slot)tasks.push({id:slot[2],time,receive:team.receives[time],team:team.name,teamIndex,mission:slot[0],members:slot[1],reward:rewardMap[slot[0]]})}));return tasks}
-    const expeditionTheoretical=[2790,2415,3420,3675,2700,8,9];
-    const theoretical=()=>expeditionTheoretical.map((n,i)=>i<4?n+state.settings.dailyPerResource+state.settings.monthlyPerResource:n);
+    const theoretical=(templateId=dayState().template)=>{const total=[0,0,0,0,0,0,0];buildTasks(templateId).forEach(task=>task.reward.forEach((n,i)=>total[i]+=n));return total.map((n,i)=>i<4?n+state.settings.dailyPerResource+state.settings.monthlyPerResource:n)};
     const allReward=()=>{const total=[0,0,0,0,0,0,0];Object.values(state.days).forEach(day=>{Object.entries(day.checks||{}).forEach(([template,ids])=>{const taskById=new Map(buildTasks(template).map(t=>[t.id,t]));ids.forEach(id=>{const task=taskById.get(id);if(task)task.reward.forEach((n,i)=>total[i]+=n)})});for(let i=0;i<4;i++)total[i]+=(day.dailyAmount||0)+(day.monthlyAmount||0)+(day.adjustments?.[i]||0)});return total};
     const number=n=>Math.round(n).toLocaleString('zh-CN');
     const showTime=t=>{const next=t.startsWith('次日');const raw=next?t.slice(2):t;const clock=raw.includes(':')?raw:`${raw}:00`;return next?`次日 ${clock}`:clock};
@@ -222,11 +227,12 @@
     function renderStocks(){
       const gained=allReward(),current=state.baseline.map((n,i)=>n+gained[i]-(state.rewardAnchor?.[i]||0)),target=state.target,dailyYield=theoretical();
       document.querySelector('#stocks').innerHTML=resourceNames.map((name,i)=>{const remaining=Math.max(0,target-current[i]),days=Math.ceil(remaining/dailyYield[i]);return `<div class="stock"><div class="stock-top"><span>${name}</span><span>目标 ${target/10000} 万</span></div><strong>${number(current[i])}</strong><span class="projected">${remaining?`按完整日收益约 ${days} 天`:'已达成'}</span><label class="stock-top">校准当前库存<input type="number" min="0" step="1" data-baseline="${i}" value="${current[i]}"></label><div class="bar"><i style="--p:${Math.min(100,current[i]/target*100)}%"></i></div></div>`}).join('');
-      const eta=Math.max(...current.map((n,i)=>Math.ceil(Math.max(0,target-n)/dailyYield[i])));document.querySelector('#eta').innerHTML=`<span>目标：四项资源各 <strong>${target/10000} 万</strong></span><span>预计全部达成：<strong>${eta?`${eta} 天`:'已达成'}</strong></span>`;document.querySelector('#toolEta').innerHTML=`<span>${eta} 天理论道具收益</span><span><strong>小判 ${number(eta*2000)}</strong> · 委托符 ${number(eta*8)} 张 · 加速符 ${number(eta*9)} 张</span>`;
+      const eta=Math.max(...current.map((n,i)=>Math.ceil(Math.max(0,target-n)/dailyYield[i])));document.querySelector('#eta').innerHTML=`<span>目标：四项资源各 <strong>${target/10000} 万</strong></span><span>预计全部达成：<strong>${eta?`${eta} 天`:'已达成'}</strong></span>`;document.querySelector('#toolEta').innerHTML=`<span>${eta} 天理论道具收益</span><span><strong>小判 ${number(eta*dailyYield[4])}</strong> · 委托符 ${number(eta*dailyYield[5])} 张 · 加速符 ${number(eta*dailyYield[6])} 张</span>`;
     }
     function render(){
       const day=dayState(),tasks=buildTasks(day.template),valid=new Set(tasks.map(t=>t.id));day.checks[day.template]=day.checks[day.template].filter(id=>valid.has(id));const checked=new Set(day.checks[day.template]);
       document.querySelector('#gameDate').value=selectedDate;document.querySelector('#gameDate').max=gameDay();document.querySelector('#templateSelect').value=day.template;document.querySelector('#targetSelect').value=String(state.target);
+      const flower=day.template==='sprint70'?{total:16,free:13,note:'太刀 2 · 大太刀 1；其余 13 把可自由选择刀种'}:{total:17,free:14,note:'太刀 2 · 大太刀 1；其余 14 把可自由选择刀种'};document.querySelector('#flowerMeta').textContent=`最低刀种需求 · 合计 ${flower.total} 把`;document.querySelector('#flowerFree').textContent=flower.free;document.querySelector('#flowerTotal').textContent=flower.total;document.querySelector('#flowerNote').textContent=flower.note;
       document.querySelector('#dailySetting').value=state.settings.dailyPerResource;document.querySelector('#monthlySetting').value=state.settings.monthlyPerResource;
       document.querySelector('#dateLabel').textContent=`${selectedDate} · ${selectedDate===gameDay()?'当前游戏日':'历史补打卡'} · ${storageAvailable?'本地持久化':'未持久化'}`;
       const dailyDisplay=day.dailyAmount??state.settings.dailyPerResource,monthlyDisplay=day.monthlyAmount??state.settings.monthlyPerResource;
