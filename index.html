@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="远征看板">
   <meta name="format-detection" content="telephone=no">
-  <title>刀剑乱舞 · 四队远征看板</title>
+  <title>刀剑乱舞 · 五队远征看板</title>
   <style>
     :root {
       --ink:#ece6d6; --muted:#a8a18f; --paper:#151816; --panel:#1d211e;
@@ -43,7 +43,7 @@
     .tick:last-child:before{background:var(--panel)}
     .tick strong{display:block;color:var(--ink);font-size:15px}
     .roster-scroll{overflow-x:auto;padding:0 22px 24px}
-    .roster{min-width:760px;display:grid;grid-template-columns:92px repeat(4,minmax(150px,1fr));grid-template-rows:52px repeat(12,64px);position:relative;border:1px solid var(--line);background:#181b19}
+    .roster{min-width:920px;display:grid;grid-template-columns:92px repeat(5,minmax(150px,1fr));grid-template-rows:52px repeat(14,64px);position:relative;border:1px solid var(--line);background:#181b19}
     .roster:before{content:"";position:absolute;left:92px;right:0;top:52px;bottom:0;background:repeating-linear-gradient(to bottom,transparent 0,transparent 63px,var(--line) 63px,var(--line) 64px);pointer-events:none}
     .roster-corner,.roster-head{display:grid;place-items:center;background:#202521;border-right:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--gold2);font-family:"Songti SC",serif;font-size:16px;position:sticky;top:0;z-index:4}
     .roster-corner{grid-column:1;grid-row:1;left:0;z-index:6;font-family:inherit;font-size:12px;color:var(--muted)}
@@ -55,7 +55,7 @@
     .roster-block b{font:700 20px Georgia,serif;letter-spacing:.04em}.roster-block span{font-size:12px;margin-top:3px;font-weight:600}.roster-block small{font-size:10px;margin-top:5px;padding:2px 6px;border-radius:9px;background:rgba(20,24,20,.12);font-weight:700}.roster-block.done{opacity:.38;filter:grayscale(.5)}
     .roster-block.done:after{content:"✓ 已收取";position:absolute;right:7px;top:5px;font-size:10px;font-weight:700}
     .roster-wait{margin:2px;border:1px solid #626860;display:grid;place-items:center;text-align:center;padding:5px;z-index:2;color:#d7d9d3;background:repeating-linear-gradient(135deg,#454a46 0,#454a46 8px,#3b403c 8px,#3b403c 16px);font-size:11px;font-weight:700}
-    .team-1{background:#aebfe8}.team-2{background:#f3b994}.team-3{background:#b9dba7}.team-4{background:#f4dc83}
+    .team-1{background:#aebfe8}.team-2{background:#f3b994}.team-3{background:#b9dba7}.team-4{background:#f4dc83}.team-5{background:#d7b4e8}
     .roster-legend{display:flex;gap:14px;flex-wrap:wrap;padding:0 22px 18px;color:var(--muted);font-size:12px}.roster-legend span:before{content:"";display:inline-block;width:10px;height:10px;background:var(--c);margin-right:5px;vertical-align:-1px}
     .table-scroll{overflow-x:auto;padding:0 22px 22px}
     table{width:100%;min-width:900px;border-collapse:collapse;table-layout:fixed;font-size:13px}
@@ -102,7 +102,7 @@
 <body>
   <main class="wrap">
     <header>
-      <div><div class="eyebrow">Touken Ranbu · Expedition Board</div><h1>四队远征看板</h1><p class="subtitle">第三队 2-1 增补版 · 每日 08:00 统一重置 · 目标各 70 万</p></div>
+      <div><div class="eyebrow">Touken Ranbu · Expedition Board</div><h1>五队远征看板</h1><p class="subtitle">库存可随时校准 · 第五队 22:00 派遣 4-4 · 次日 04:00 返回后醒来收取</p></div>
       <div class="seal" aria-hidden="true">遠<br>征</div>
     </header>
 
@@ -122,17 +122,17 @@
     </section>
 
     <section class="panel">
-      <div class="panel-head"><h2>四队远征时间线</h2><small>色块从派遣时刻延伸至该队下一次收取 · 点击色块可勾选</small></div>
+      <div class="panel-head"><h2>五队远征时间线</h2><small>色块从派遣时刻延伸至该队下一次收取 · 点击色块可勾选</small></div>
       <div class="roster-scroll"><div class="roster" id="roster"></div></div>
-      <div class="roster-legend"><span style="--c:#aebfe8">队 1</span><span style="--c:#f3b994">队 2</span><span style="--c:#b9dba7">队 3</span><span style="--c:#f4dc83">队 4</span><span style="--c:#454a46">空余 / 返回待收</span><span>队 3 次日 05:30 返回，缓冲 2 小时 30 分；其余三队次日 06:00 返回，缓冲 2 小时</span></div>
+      <div class="roster-legend"><span style="--c:#aebfe8">队 1</span><span style="--c:#f3b994">队 2</span><span style="--c:#b9dba7">队 3</span><span style="--c:#f4dc83">队 4</span><span style="--c:#d7b4e8">队 5</span><span style="--c:#454a46">空余 / 返回待收</span><span>队 5 次日 04:00 返回，无需起床收取；醒来后再收取。</span></div>
     </section>
 
     <div class="grid">
       <section class="panel">
-        <div class="panel-head"><h2>每日刷花</h2><small>最低刀种需求 · 合计 14 把</small></div>
+        <div class="panel-head"><h2>每日刷花</h2><small>最低刀种需求 · 合计 17 把</small></div>
         <div class="flower">
-          <div class="flower-row"><div class="flower-item"><span>太刀</span><strong>2</strong></div><div class="flower-item"><span>大太刀</span><strong>1</strong></div><div class="flower-item"><span>自由刀种</span><strong>11</strong></div><div class="flower-item"><span>合计</span><strong>14</strong></div></div>
-          <div class="flower-total">至少需要：<b>太刀 2 · 大太刀 1；其余 11 把可自由选择刀种</b></div>
+          <div class="flower-row"><div class="flower-item"><span>太刀</span><strong>2</strong></div><div class="flower-item"><span>大太刀</span><strong>1</strong></div><div class="flower-item"><span>自由刀种</span><strong>14</strong></div><div class="flower-item"><span>合计</span><strong>17</strong></div></div>
+          <div class="flower-total">至少需要：<b>太刀 2 · 大太刀 1；第五队再增加 3 把自由刀种，共 17 把</b></div>
         </div>
       </section>
       <section class="panel">
@@ -142,7 +142,7 @@
     </div>
 
     <section class="panel">
-      <div class="panel-head"><h2>库存与目标</h2><small>当前库存：45 / 46 / 43 / 48 万</small></div>
+      <div class="panel-head"><h2>库存与目标</h2><small>直接填写游戏里的当前库存；之后的打卡收益会继续累加</small></div>
       <div class="stock-grid" id="stocks"></div>
       <div class="eta" id="eta"></div>
       <div class="eta" id="toolEta"></div>
@@ -157,7 +157,7 @@
       <div class="adjustments" id="adjustments"></div>
       <div class="checklist" id="checklist"></div>
     </section>
-    <footer>刀剑乱舞 · 四队远征资源计划 ｜ 单文件离线看板</footer>
+    <footer>刀剑乱舞 · 五队远征资源计划 ｜ 单文件离线看板</footer>
   </main>
   <script>
     const STORAGE_KEY='touken-expedition-board-v2';
@@ -170,18 +170,19 @@
       '4-1':[0,120,150,90,0,1,0],'4-3':[150,300,750,0,0,0,2],
       '4-4':[225,0,0,600,700,0,0],'5-1':[375,375,375,0,0,0,2]
     };
-    const times=['08','10','11','12','14','16','17','18','20','21:30','次日05:30','次日06','次日08'];
+    const times=['08','10','11','12','14','16','17','18','20','21:30','22','次日04','次日05:30','次日06','次日08'];
     const dailyTeams=[
       {name:'队 1',slots:{'08':['2-3','太刀A','exp-001'],'10':['2-3','太刀A','exp-005'],'12':['2-3','太刀A','exp-007'],'14':['2-3','太刀A','exp-009'],'16':['2-3','太刀B','exp-012'],'18':['5-1','太刀B + C + D','exp-015']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'次日06'}},
       {name:'队 2',slots:{'08':['3-1','A + B','exp-002'],'12':['3-1','A + B','exp-008'],'16':['4-1','A + B','exp-013'],'18':['4-3','A + B + C','exp-016']},receives:{'08':'12','12':'16','16':'18','18':'次日06'}},
       {name:'队 3',slots:{'08':['3-2','大太刀A + B','exp-003'],'11':['3-2','大太刀A + B','exp-006'],'14':['3-2','大太刀A + B','exp-010'],'17':['3-2','大太刀A + B','exp-014'],'20':['2-1','C','exp-017'],'21:30':['3-4','C + D','exp-019']},receives:{'08':'11','11':'14','14':'17','17':'20','20':'21:30','21:30':'次日05:30'}},
-      {name:'队 4',slots:{'08':['4-4','A + B + C','exp-004'],'14':['4-4','A + B + C','exp-011'],'20':['3-3','A + B','exp-018']},receives:{'08':'14','14':'20','20':'次日06'}}
+      {name:'队 4',slots:{'08':['4-4','A + B + C','exp-004'],'14':['4-4','A + B + C','exp-011'],'20':['3-3','A + B','exp-018']},receives:{'08':'14','14':'20','20':'次日06'}},
+      {name:'队 5',slots:{'22':['4-4','A + B + C','exp-020']},receives:{'22':'次日04'}}
     ];
     const templates={daily:{name:'70 万冲刺版',teams:dailyTeams},sprint85:{name:'85 万冲刺模板'},sprint100:{name:'100 万冲刺模板'}};
     const legacyTaskIds={'08-1':'exp-001','08-2':'exp-002','08-3':'exp-003','08-4':'exp-004','10-1':'exp-005','11-3':'exp-006','12-1':'exp-007','12-2':'exp-008','14-1':'exp-009','14-3':'exp-010','14-4':'exp-011','16-1':'exp-012','16-2':'exp-013','17-3':'exp-014','18-1':'exp-015','18-2':'exp-016','20-3':'exp-017','20-4':'exp-018','21:30-3':'exp-019'};
     const templateTaskIds={daily:new Set(dailyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),sprint85:new Set(),sprint100:new Set()};
     document.querySelector('#templateSelect option[value="daily"]').textContent=templates.daily.name;
-    const defaultState=()=>({version:4,baseline:[450000,460000,430000,480000],target:700000,settings:{dailyPerResource:2050,monthlyPerResource:900},days:{}});
+    const defaultState=()=>({version:4,baseline:[450000,460000,430000,480000],rewardAnchor:[0,0,0,0],target:700000,settings:{dailyPerResource:2050,monthlyPerResource:900},days:{}});
     const pad=n=>String(n).padStart(2,'0');
     const formatDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     function gameDay(date=new Date()){const d=new Date(date);if(d.getHours()<8)d.setDate(d.getDate()-1);return formatDate(d)}
@@ -193,7 +194,8 @@
       if(!settings||![settings.dailyPerResource,settings.monthlyPerResource].every(n=>Number.isInteger(Number(n))&&Number(n)>=0))throw new Error('日课或月卡配置无效');
       const normalizedSettings={dailyPerResource:Number(settings.dailyPerResource),monthlyPerResource:Number(settings.monthlyPerResource)};
       const days={};Object.entries(value.days).forEach(([date,day])=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!day||!templates[day.template])return;const source=day.checks&&typeof day.checks==='object'?day.checks:{daily:Array.isArray(day.checked)?day.checked:[]},checks={};Object.entries(source).forEach(([template,ids])=>{if(!templates[template]||!Array.isArray(ids))return;const migrated=ids.filter(x=>typeof x==='string').map(id=>value.version===2&&template==='daily'?legacyTaskIds[id]:id).filter(id=>templateTaskIds[template].has(id));checks[template]=[...new Set(migrated)]});const dailyAmount=value.version===4?day.dailyAmount:(day.daily?2050:null),monthlyAmount=value.version===4?day.monthlyAmount:(day.monthly?900:null),adjustments=value.version===4?day.adjustments:[0,0,0,0];if(dailyAmount!==null&&(!Number.isInteger(Number(dailyAmount))||Number(dailyAmount)<0))throw new Error(`${date} 的日课快照无效`);if(monthlyAmount!==null&&(!Number.isInteger(Number(monthlyAmount))||Number(monthlyAmount)<0))throw new Error(`${date} 的月卡快照无效`);if(!Array.isArray(adjustments)||adjustments.length!==4||adjustments.some(n=>!Number.isInteger(Number(n))))throw new Error(`${date} 的额外收支无效`);days[date]={template:day.template,checks,dailyAmount:dailyAmount===null?null:Number(dailyAmount),monthlyAmount:monthlyAmount===null?null:Number(monthlyAmount),adjustments:adjustments.map(Number)}});
-      return {version:4,baseline,target,settings:normalizedSettings,days};
+      const rewardAnchor=Array.isArray(value.rewardAnchor)&&value.rewardAnchor.length===4?value.rewardAnchor.map(Number):[0,0,0,0];
+      return {version:4,baseline,rewardAnchor,target,settings:normalizedSettings,days};
     }
     let storageAvailable=true,state=defaultState(),migratedOnLoad=false;
     function setStatus(message,error=false){const el=document.querySelector('#status');el.textContent=message;el.style.color=error?'#e3a49a':''}
@@ -203,7 +205,7 @@
     function save({backup=true}={}){try{const current=localStorage.getItem(STORAGE_KEY);if(backup&&current)localStorage.setItem(BACKUP_KEY,current);localStorage.setItem(STORAGE_KEY,JSON.stringify(state));storageAvailable=true;setStatus('已保存在当前设备')}catch(error){storageAvailable=false;setStatus('无法写入本地存储，请立即导出 JSON 备份',true)}}
     if(migratedOnLoad)save();
     function buildTasks(templateId){const teams=templates[templateId].teams||[];const tasks=[];times.forEach(time=>teams.forEach((team,teamIndex)=>{const slot=team.slots[time];if(slot)tasks.push({id:slot[2],time,receive:team.receives[time],team:team.name,teamIndex,mission:slot[0],members:slot[1],reward:rewardMap[slot[0]]})}));return tasks}
-    const expeditionTheoretical=[2565,2415,3420,3075,2000,8,9];
+    const expeditionTheoretical=[2790,2415,3420,3675,2700,8,9];
     const theoretical=()=>expeditionTheoretical.map((n,i)=>i<4?n+state.settings.dailyPerResource+state.settings.monthlyPerResource:n);
     const allReward=()=>{const total=[0,0,0,0,0,0,0];Object.values(state.days).forEach(day=>{Object.entries(day.checks||{}).forEach(([template,ids])=>{const taskById=new Map(buildTasks(template).map(t=>[t.id,t]));ids.forEach(id=>{const task=taskById.get(id);if(task)task.reward.forEach((n,i)=>total[i]+=n)})});for(let i=0;i<4;i++)total[i]+=(day.dailyAmount||0)+(day.monthlyAmount||0)+(day.adjustments?.[i]||0)});return total};
     const number=n=>Math.round(n).toLocaleString('zh-CN');
@@ -218,8 +220,8 @@
       roster.innerHTML=`<div class="roster-corner">时间</div>${heads}${labels}${blocks}${waits}`;
     }
     function renderStocks(){
-      const gained=allReward(),current=state.baseline.map((n,i)=>n+gained[i]),target=state.target,dailyYield=theoretical();
-      document.querySelector('#stocks').innerHTML=resourceNames.map((name,i)=>{const remaining=Math.max(0,target-current[i]),days=Math.ceil(remaining/dailyYield[i]);return `<div class="stock"><div class="stock-top"><span>${name}</span><span>目标 ${target/10000} 万</span></div><strong>${number(current[i])}</strong><span class="projected">${remaining?`按完整日收益约 ${days} 天`:'已达成'}</span><label class="stock-top">库存基准<input type="number" min="0" step="1" data-baseline="${i}" value="${state.baseline[i]}"></label><div class="bar"><i style="--p:${Math.min(100,current[i]/target*100)}%"></i></div></div>`}).join('');
+      const gained=allReward(),current=state.baseline.map((n,i)=>n+gained[i]-(state.rewardAnchor?.[i]||0)),target=state.target,dailyYield=theoretical();
+      document.querySelector('#stocks').innerHTML=resourceNames.map((name,i)=>{const remaining=Math.max(0,target-current[i]),days=Math.ceil(remaining/dailyYield[i]);return `<div class="stock"><div class="stock-top"><span>${name}</span><span>目标 ${target/10000} 万</span></div><strong>${number(current[i])}</strong><span class="projected">${remaining?`按完整日收益约 ${days} 天`:'已达成'}</span><label class="stock-top">校准当前库存<input type="number" min="0" step="1" data-baseline="${i}" value="${current[i]}"></label><div class="bar"><i style="--p:${Math.min(100,current[i]/target*100)}%"></i></div></div>`}).join('');
       const eta=Math.max(...current.map((n,i)=>Math.ceil(Math.max(0,target-n)/dailyYield[i])));document.querySelector('#eta').innerHTML=`<span>目标：四项资源各 <strong>${target/10000} 万</strong></span><span>预计全部达成：<strong>${eta?`${eta} 天`:'已达成'}</strong></span>`;document.querySelector('#toolEta').innerHTML=`<span>${eta} 天理论道具收益</span><span><strong>小判 ${number(eta*2000)}</strong> · 委托符 ${number(eta*8)} 张 · 加速符 ${number(eta*9)} 张</span>`;
     }
     function render(){
@@ -242,7 +244,7 @@
     document.querySelector('#gameDate').addEventListener('change',e=>{if(e.target.value&&e.target.value<=gameDay()){selectedDate=e.target.value;render()}else{setStatus('不能选择未来游戏日',true);render()}});document.querySelector('#todayButton').addEventListener('click',()=>{selectedDate=gameDay();render()});
     document.querySelector('#templateSelect').addEventListener('change',e=>{dayState().template=e.target.value;save();render()});document.querySelector('#targetSelect').addEventListener('change',e=>{state.target=Number(e.target.value);save();render()});
     ['dailySetting','monthlySetting'].forEach((id,index)=>document.querySelector(`#${id}`).addEventListener('change',e=>{const value=Number(e.target.value);if(Number.isInteger(value)&&value>=0){state.settings[index===0?'dailyPerResource':'monthlyPerResource']=value;save();render()}else{setStatus('日课和月卡标准必须是非负整数',true);render()}}));
-    document.querySelector('#stocks').addEventListener('change',e=>{if(!e.target.matches('[data-baseline]'))return;const value=Number(e.target.value);if(Number.isFinite(value)&&value>=0){state.baseline[Number(e.target.dataset.baseline)]=Math.round(value);save();render()}else{setStatus('库存基准必须是非负整数',true);render()}});
+    document.querySelector('#stocks').addEventListener('change',e=>{if(!e.target.matches('[data-baseline]'))return;const value=Number(e.target.value),index=Number(e.target.dataset.baseline),gained=allReward();if(Number.isFinite(value)&&value>=0){state.baseline[index]=Math.round(value);state.rewardAnchor[index]=gained[index];save();render()}else{setStatus('当前库存必须是非负整数',true);render()}});
     document.querySelector('#reset').addEventListener('click',()=>{if(confirm(`确定清除 ${selectedDate} 的全部打卡、日课、月卡和额外收支吗？`)){const day=dayState();day.checks={daily:[]};day.dailyAmount=null;day.monthlyAmount=null;day.adjustments=[0,0,0,0];save();render()}});
     document.querySelector('#exportButton').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`刀剑乱舞-远征看板备份-${gameDay()}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);setStatus('已导出 JSON 备份')});
     document.querySelector('#importButton').addEventListener('click',()=>document.querySelector('#importFile').click());document.querySelector('#importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const next=validState(JSON.parse(await file.text()));try{const current=localStorage.getItem(STORAGE_KEY);if(current)localStorage.setItem(BACKUP_KEY,current)}catch(_){}state=next;save({backup:false});selectedDate=gameDay();render();setStatus('备份导入成功')}catch(error){setStatus(`导入失败：${error.message}，原数据未改动`,true)}finally{e.target.value=''}});
