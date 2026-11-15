@@ -43,7 +43,7 @@
     .tick:last-child:before{background:var(--panel)}
     .tick strong{display:block;color:var(--ink);font-size:15px}
     .roster-scroll{overflow-x:auto;padding:0 22px 24px}
-    .roster{min-width:920px;display:grid;grid-template-columns:92px repeat(5,minmax(150px,1fr));grid-template-rows:52px repeat(15,64px);position:relative;border:1px solid var(--line);background:#181b19}
+    .roster{min-width:920px;display:grid;grid-template-columns:92px repeat(5,minmax(150px,1fr));grid-template-rows:52px repeat(16,64px);position:relative;border:1px solid var(--line);background:#181b19}
     .roster:before{content:"";position:absolute;left:92px;right:0;top:52px;bottom:0;background:repeating-linear-gradient(to bottom,transparent 0,transparent 63px,var(--line) 63px,var(--line) 64px);pointer-events:none}
     .roster-corner,.roster-head{display:grid;place-items:center;background:#202521;border-right:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--gold2);font-family:"Songti SC",serif;font-size:16px;position:sticky;top:0;z-index:4}
     .roster-corner{grid-column:1;grid-row:1;left:0;z-index:6;font-family:inherit;font-size:12px;color:var(--muted)}
@@ -112,7 +112,7 @@
       <div class="panel-head"><h2>游戏日与方案</h2><small>每日本地时间 08:00 切换游戏日</small></div>
       <div class="control-panel">
         <div class="control"><label for="gameDate">查看 / 补打卡日期</label><input id="gameDate" type="date"></div>
-        <div class="control"><label for="templateSelect">当日远征模板</label><select id="templateSelect"><option value="sprint70">70w冲刺</option><option value="daily">100w冲刺</option></select></div>
+        <div class="control"><label for="templateSelect">当日远征模板</label><select id="templateSelect"><option value="sprint70">70w冲刺</option><option value="daily">100w冲刺</option><option value="sprint70Legacy" hidden disabled>70w冲刺（旧版历史）</option></select></div>
         <div class="control"><label for="targetSelect">资源目标</label><select id="targetSelect"><option value="700000">70 万</option><option value="850000">85 万</option><option value="1000000">100 万</option></select></div>
         <div class="control"><label for="dailySetting">日课（每项资源）</label><input id="dailySetting" type="number" min="0" step="1"></div>
         <div class="control"><label for="monthlySetting">月卡（每项资源）</label><input id="monthlySetting" type="number" min="0" step="1"></div>
@@ -170,7 +170,7 @@
       '4-1':[0,120,150,90,0,1,0],'4-3':[150,300,750,0,0,0,2],
       '4-4':[225,0,0,600,700,0,0],'5-1':[375,375,375,0,0,0,2]
     };
-    const times=['08','10','11','12','14','16','17','18','20','21:30','22','次日02','次日04','次日05:30','次日06','次日08'];
+    const times=['08','10','11','12','14','16','17','18','19','20','21:30','22','次日02','次日04','次日05:30','次日06','次日08'];
     const dailyTeams=[
       {name:'队 1',slots:{'08':['2-3','太刀A','exp-001'],'10':['2-3','太刀A','exp-005'],'12':['2-3','太刀A','exp-007'],'14':['2-3','太刀A','exp-009'],'16':['2-3','太刀B','exp-012'],'18':['5-1','太刀B + C + D','exp-015']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'次日06'}},
       {name:'队 2',slots:{'08':['3-1','A + B','exp-002'],'12':['3-1','A + B','exp-008'],'16':['4-1','A + B','exp-013'],'18':['4-3','A + B + C','exp-016']},receives:{'08':'12','12':'16','16':'18','18':'次日06'}},
@@ -178,34 +178,41 @@
       {name:'队 4',slots:{'08':['4-4','A + B + C','exp-004'],'14':['4-4','A + B + C','exp-011'],'20':['3-3','A + B','exp-018']},receives:{'08':'14','14':'20','20':'次日06'}},
       {name:'队 5',slots:{'22':['4-4','A + B + C','exp-020']},receives:{'22':'次日04'}}
     ];
-    const sprint70Teams=[
+    const sprint70LegacyTeams=[
       {name:'队 1',slots:{'08':['2-3','太刀A','p70-001'],'10':['2-3','太刀A','p70-002'],'12':['2-3','太刀A','p70-003'],'14':['2-3','太刀B','p70-004'],'16':['2-3','太刀B','p70-005'],'18':['2-3','太刀B','p70-006'],'20':['2-3','太刀C','p70-007'],'22':['3-1','A + B','p70-008']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'20','20':'22','22':'次日02'}},
       {name:'队 2',slots:{'08':['4-1','A + B','p70-009'],'10':['4-1','A + B','p70-010'],'12':['4-1','C + D','p70-011'],'14':['4-1','C + D','p70-012'],'16':['4-1','E + F','p70-013'],'18':['4-1','E + F','p70-014'],'20':['4-1','G + H','p70-015'],'22':['3-3','I + J','p70-016']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'20','20':'22','22':'次日08'}},
       {name:'队 3',slots:{'08':['3-2','大太刀A + B','p70-017'],'11':['3-2','大太刀A + B','p70-018'],'14':['3-1','C + D','p70-019'],'18':['3-1','C + D','p70-020'],'22':['3-4','E + F','p70-021']},receives:{'08':'11','11':'14','14':'18','18':'22','22':'次日06'}},
       {name:'队 4',slots:{'08':['3-1','A + B','p70-022'],'12':['4-4','A + B + C','p70-023'],'18':['5-1','A + B + C','p70-024']},receives:{'08':'12','12':'18','18':'次日06'}},
       {name:'队 5',slots:{'22':['4-4','A + B + C','p70-025']},receives:{'22':'次日04'}}
     ];
-    const templates={sprint70:{name:'70w冲刺',teams:sprint70Teams},daily:{name:'100w冲刺',teams:dailyTeams},sprint85:{name:'85 万冲刺模板'},sprint100:{name:'100 万冲刺模板（旧占位）'}};
+    const sprint70Teams=[
+      {name:'队 1',slots:{'08':['2-3','太刀A','p70v2-001'],'10':['2-3','太刀A','p70v2-002'],'12':['2-3','太刀A','p70v2-003'],'14':['2-3','太刀B','p70v2-004'],'16':['2-3','太刀B','p70v2-005'],'18':['2-3','太刀B','p70v2-006'],'20':['2-3','太刀C','p70v2-007'],'22':['3-1','A + B','p70v2-008']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'20','20':'22','22':'次日02'}},
+      {name:'队 2',slots:{'08':['4-1','A + B','p70v2-009'],'10':['4-1','A + B','p70v2-010'],'12':['4-1','C + D','p70v2-011'],'14':['4-1','C + D','p70v2-012'],'16':['4-1','E + F','p70v2-013'],'18':['4-1','E + F','p70v2-014'],'20':['3-3','I + J','p70v2-015']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'20','20':'次日06'}},
+      {name:'队 3',slots:{'08':['3-2','大太刀A + B','p70v2-016'],'11':['3-2','大太刀A + B','p70v2-017'],'14':['3-1','C + D','p70v2-018'],'18':['3-1','C + D','p70v2-019'],'22':['3-4','E + F','p70v2-020']},receives:{'08':'11','11':'14','14':'18','18':'22','22':'次日06'}},
+      {name:'队 4',slots:{'08':['3-1','A + B','p70v2-021'],'12':['4-4','A + B + C','p70v2-022'],'18':['5-1','A + B + C','p70v2-023']},receives:{'08':'12','12':'18','18':'次日06'}},
+      {name:'队 5',slots:{'19':['3-2','大太刀A + B','p70v2-024'],'22':['4-4','大太刀A + B + C','p70v2-025']},receives:{'19':'22','22':'次日04'}}
+    ];
+    const templates={sprint70:{name:'70w冲刺',teams:sprint70Teams},sprint70Legacy:{name:'70w冲刺（旧版历史）',teams:sprint70LegacyTeams},daily:{name:'100w冲刺',teams:dailyTeams},sprint85:{name:'85 万冲刺模板'},sprint100:{name:'100 万冲刺模板（旧占位）'}};
     const legacyTaskIds={'08-1':'exp-001','08-2':'exp-002','08-3':'exp-003','08-4':'exp-004','10-1':'exp-005','11-3':'exp-006','12-1':'exp-007','12-2':'exp-008','14-1':'exp-009','14-3':'exp-010','14-4':'exp-011','16-1':'exp-012','16-2':'exp-013','17-3':'exp-014','18-1':'exp-015','18-2':'exp-016','20-3':'exp-017','20-4':'exp-018','21:30-3':'exp-019'};
-    const templateTaskIds={sprint70:new Set(sprint70Teams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),daily:new Set(dailyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),sprint85:new Set(),sprint100:new Set()};
-    const defaultState=()=>({version:4,baseline:[450000,460000,430000,480000],rewardAnchor:[0,0,0,0],target:700000,settings:{dailyPerResource:2050,monthlyPerResource:900},days:{}});
+    const templateTaskIds={sprint70:new Set(sprint70Teams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),sprint70Legacy:new Set(sprint70LegacyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),daily:new Set(dailyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),sprint85:new Set(),sprint100:new Set()};
+    const defaultState=()=>({version:5,baseline:[450000,460000,430000,480000],rewardAnchor:[0,0,0,0],target:700000,settings:{dailyPerResource:2050,monthlyPerResource:900},days:{}});
     const pad=n=>String(n).padStart(2,'0');
     const formatDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     function gameDay(date=new Date()){const d=new Date(date);if(d.getHours()<8)d.setDate(d.getDate()-1);return formatDate(d)}
     function validState(value){
-      if(!value||![2,3,4].includes(value.version)||!Array.isArray(value.baseline)||value.baseline.length!==4||!value.days||typeof value.days!=='object')throw new Error('备份格式不受支持');
+      if(!value||![2,3,4,5].includes(value.version)||!Array.isArray(value.baseline)||value.baseline.length!==4||!value.days||typeof value.days!=='object')throw new Error('备份格式不受支持');
       const baseline=value.baseline.map(Number);if(baseline.some(n=>!Number.isFinite(n)||n<0))throw new Error('库存基准无效');
       const target=Number(value.target);if(![700000,850000,1000000].includes(target))throw new Error('目标值无效');
-      const settings=value.version===4?value.settings:{dailyPerResource:2050,monthlyPerResource:900};
+      const settings=value.version>=4?value.settings:{dailyPerResource:2050,monthlyPerResource:900};
       if(!settings||![settings.dailyPerResource,settings.monthlyPerResource].every(n=>Number.isInteger(Number(n))&&Number(n)>=0))throw new Error('日课或月卡配置无效');
       const normalizedSettings={dailyPerResource:Number(settings.dailyPerResource),monthlyPerResource:Number(settings.monthlyPerResource)};
-      const days={};Object.entries(value.days).forEach(([date,day])=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!day||!templates[day.template])return;const source=day.checks&&typeof day.checks==='object'?day.checks:{daily:Array.isArray(day.checked)?day.checked:[]},checks={};Object.entries(source).forEach(([template,ids])=>{if(!templates[template]||!Array.isArray(ids))return;const migrated=ids.filter(x=>typeof x==='string').map(id=>value.version===2&&template==='daily'?legacyTaskIds[id]:id).filter(id=>templateTaskIds[template].has(id));checks[template]=[...new Set(migrated)]});const dailyAmount=value.version===4?day.dailyAmount:(day.daily?2050:null),monthlyAmount=value.version===4?day.monthlyAmount:(day.monthly?900:null),adjustments=value.version===4?day.adjustments:[0,0,0,0];if(dailyAmount!==null&&(!Number.isInteger(Number(dailyAmount))||Number(dailyAmount)<0))throw new Error(`${date} 的日课快照无效`);if(monthlyAmount!==null&&(!Number.isInteger(Number(monthlyAmount))||Number(monthlyAmount)<0))throw new Error(`${date} 的月卡快照无效`);if(!Array.isArray(adjustments)||adjustments.length!==4||adjustments.some(n=>!Number.isInteger(Number(n))))throw new Error(`${date} 的额外收支无效`);days[date]={template:day.template,checks,dailyAmount:dailyAmount===null?null:Number(dailyAmount),monthlyAmount:monthlyAmount===null?null:Number(monthlyAmount),adjustments:adjustments.map(Number)}});
+      const days={};Object.entries(value.days).forEach(([date,day])=>{const dayTemplate=value.version<5&&day?.template==='sprint70'?'sprint70Legacy':day?.template;if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!day||!templates[dayTemplate])return;const source=day.checks&&typeof day.checks==='object'?day.checks:{daily:Array.isArray(day.checked)?day.checked:[]},checks={};Object.entries(source).forEach(([template,ids])=>{const checkTemplate=value.version<5&&template==='sprint70'?'sprint70Legacy':template;if(!templates[checkTemplate]||!Array.isArray(ids))return;const migrated=ids.filter(x=>typeof x==='string').map(id=>value.version===2&&checkTemplate==='daily'?legacyTaskIds[id]:id).filter(id=>templateTaskIds[checkTemplate].has(id));checks[checkTemplate]=[...new Set(migrated)]});const dailyAmount=value.version>=4?day.dailyAmount:(day.daily?2050:null),monthlyAmount=value.version>=4?day.monthlyAmount:(day.monthly?900:null),adjustments=value.version>=4?day.adjustments:[0,0,0,0];if(dailyAmount!==null&&(!Number.isInteger(Number(dailyAmount))||Number(dailyAmount)<0))throw new Error(`${date} 的日课快照无效`);if(monthlyAmount!==null&&(!Number.isInteger(Number(monthlyAmount))||Number(monthlyAmount)<0))throw new Error(`${date} 的月卡快照无效`);if(!Array.isArray(adjustments)||adjustments.length!==4||adjustments.some(n=>!Number.isInteger(Number(n))))throw new Error(`${date} 的额外收支无效`);days[date]={template:dayTemplate,checks,dailyAmount:dailyAmount===null?null:Number(dailyAmount),monthlyAmount:monthlyAmount===null?null:Number(monthlyAmount),adjustments:adjustments.map(Number)}});
       const rewardAnchor=Array.isArray(value.rewardAnchor)&&value.rewardAnchor.length===4?value.rewardAnchor.map(Number):[0,0,0,0];
-      return {version:4,baseline,rewardAnchor,target,settings:normalizedSettings,days};
+      return {version:5,baseline,rewardAnchor,target,settings:normalizedSettings,days};
     }
     let storageAvailable=true,state=defaultState(),migratedOnLoad=false;
     function setStatus(message,error=false){const el=document.querySelector('#status');el.textContent=message;el.style.color=error?'#e3a49a':''}
-    try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);state=validState(parsed);migratedOnLoad=parsed.version!==4}}catch(error){storageAvailable=false;setTimeout(()=>setStatus(`已使用安全默认值：${error.message}`,true))}
+    try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);state=validState(parsed);migratedOnLoad=parsed.version!==5}}catch(error){storageAvailable=false;setTimeout(()=>setStatus(`已使用安全默认值：${error.message}`,true))}
     let selectedDate=gameDay();
     function dayState(){const day=state.days[selectedDate]||(state.days[selectedDate]={template:'sprint70',checks:{sprint70:[]},dailyAmount:null,monthlyAmount:null,adjustments:[0,0,0,0]});if(!day.checks)day.checks={};if(!day.checks[day.template])day.checks[day.template]=[];if(!Array.isArray(day.adjustments))day.adjustments=[0,0,0,0];return day}
     function save({backup=true}={}){try{const current=localStorage.getItem(STORAGE_KEY);if(backup&&current)localStorage.setItem(BACKUP_KEY,current);localStorage.setItem(STORAGE_KEY,JSON.stringify(state));storageAvailable=true;setStatus('已保存在当前设备')}catch(error){storageAvailable=false;setStatus('无法写入本地存储，请立即导出 JSON 备份',true)}}
@@ -231,8 +238,9 @@
     }
     function render(){
       const day=dayState(),tasks=buildTasks(day.template),valid=new Set(tasks.map(t=>t.id));day.checks[day.template]=day.checks[day.template].filter(id=>valid.has(id));const checked=new Set(day.checks[day.template]);
-      document.querySelector('#gameDate').value=selectedDate;document.querySelector('#gameDate').max=gameDay();document.querySelector('#templateSelect').value=day.template;document.querySelector('#targetSelect').value=String(state.target);
-      const flower=day.template==='sprint70'?{total:16,free:13,note:'太刀 2 · 大太刀 1；其余 13 把可自由选择刀种'}:{total:17,free:14,note:'太刀 2 · 大太刀 1；其余 14 把可自由选择刀种'};document.querySelector('#flowerMeta').textContent=`最低刀种需求 · 合计 ${flower.total} 把`;document.querySelector('#flowerFree').textContent=flower.free;document.querySelector('#flowerTotal').textContent=flower.total;document.querySelector('#flowerNote').textContent=flower.note;
+      const templateSelect=document.querySelector('#templateSelect'),legacyOption=templateSelect.querySelector('[value="sprint70Legacy"]'),hasLegacy=day.template==='sprint70Legacy'||(day.checks.sprint70Legacy?.length>0);legacyOption.hidden=!hasLegacy;legacyOption.disabled=!hasLegacy;
+      document.querySelector('#gameDate').value=selectedDate;document.querySelector('#gameDate').max=gameDay();templateSelect.value=day.template;document.querySelector('#targetSelect').value=String(state.target);
+      const flower=day.template==='sprint70'||day.template==='sprint70Legacy'?{total:16,free:13,note:'太刀 2 · 大太刀 1；其余 13 把可自由选择刀种'}:{total:17,free:14,note:'太刀 2 · 大太刀 1；其余 14 把可自由选择刀种'};document.querySelector('#flowerMeta').textContent=`最低刀种需求 · 合计 ${flower.total} 把`;document.querySelector('#flowerFree').textContent=flower.free;document.querySelector('#flowerTotal').textContent=flower.total;document.querySelector('#flowerNote').textContent=flower.note;
       document.querySelector('#dailySetting').value=state.settings.dailyPerResource;document.querySelector('#monthlySetting').value=state.settings.monthlyPerResource;
       document.querySelector('#dateLabel').textContent=`${selectedDate} · ${selectedDate===gameDay()?'当前游戏日':'历史补打卡'} · ${storageAvailable?'本地持久化':'未持久化'}`;
       const dailyDisplay=day.dailyAmount??state.settings.dailyPerResource,monthlyDisplay=day.monthlyAmount??state.settings.monthlyPerResource;
@@ -251,7 +259,7 @@
     document.querySelector('#templateSelect').addEventListener('change',e=>{dayState().template=e.target.value;save();render()});document.querySelector('#targetSelect').addEventListener('change',e=>{state.target=Number(e.target.value);save();render()});
     ['dailySetting','monthlySetting'].forEach((id,index)=>document.querySelector(`#${id}`).addEventListener('change',e=>{const value=Number(e.target.value);if(Number.isInteger(value)&&value>=0){state.settings[index===0?'dailyPerResource':'monthlyPerResource']=value;save();render()}else{setStatus('日课和月卡标准必须是非负整数',true);render()}}));
     document.querySelector('#stocks').addEventListener('change',e=>{if(!e.target.matches('[data-baseline]'))return;const value=Number(e.target.value),index=Number(e.target.dataset.baseline),gained=allReward();if(Number.isFinite(value)&&value>=0){state.baseline[index]=Math.round(value);state.rewardAnchor[index]=gained[index];save();render()}else{setStatus('当前库存必须是非负整数',true);render()}});
-    document.querySelector('#reset').addEventListener('click',()=>{if(confirm(`确定清除 ${selectedDate} 的全部打卡、日课、月卡和额外收支吗？`)){const day=dayState();day.checks={daily:[]};day.dailyAmount=null;day.monthlyAmount=null;day.adjustments=[0,0,0,0];save();render()}});
+    document.querySelector('#reset').addEventListener('click',()=>{if(confirm(`确定清除 ${selectedDate} 的全部打卡、日课、月卡和额外收支吗？`)){const day=dayState();day.checks={sprint70:[],sprint70Legacy:[],daily:[]};day.dailyAmount=null;day.monthlyAmount=null;day.adjustments=[0,0,0,0];save();render()}});
     document.querySelector('#exportButton').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`刀剑乱舞-远征看板备份-${gameDay()}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);setStatus('已导出 JSON 备份')});
     document.querySelector('#importButton').addEventListener('click',()=>document.querySelector('#importFile').click());document.querySelector('#importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const next=validState(JSON.parse(await file.text()));try{const current=localStorage.getItem(STORAGE_KEY);if(current)localStorage.setItem(BACKUP_KEY,current)}catch(_){}state=next;save({backup:false});selectedDate=gameDay();render();setStatus('备份导入成功')}catch(error){setStatus(`导入失败：${error.message}，原数据未改动`,true)}finally{e.target.value=''}});
     document.querySelector('#restoreButton').addEventListener('click',()=>{try{const raw=localStorage.getItem(BACKUP_KEY);if(!raw)throw new Error('没有可恢复的备份');const previous=validState(JSON.parse(raw)),current=localStorage.getItem(STORAGE_KEY);state=previous;if(current)localStorage.setItem(BACKUP_KEY,current);save({backup:false});render();setStatus('已恢复上次备份')}catch(error){setStatus(`恢复失败：${error.message}`,true)}});
