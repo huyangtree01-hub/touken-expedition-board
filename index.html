@@ -43,7 +43,7 @@
     .tick:last-child:before{background:var(--panel)}
     .tick strong{display:block;color:var(--ink);font-size:15px}
     .roster-scroll{overflow-x:auto;padding:0 22px 24px}
-    .roster{min-width:920px;display:grid;grid-template-columns:92px repeat(5,minmax(150px,1fr));grid-template-rows:52px repeat(15,64px);position:relative;border:1px solid var(--line);background:#181b19}
+    .roster{min-width:920px;display:grid;grid-template-columns:92px repeat(5,minmax(150px,1fr));grid-template-rows:52px;grid-auto-rows:64px;position:relative;border:1px solid var(--line);background:#181b19}
     .roster:before{content:"";position:absolute;left:92px;right:0;top:52px;bottom:0;background:repeating-linear-gradient(to bottom,transparent 0,transparent 63px,var(--line) 63px,var(--line) 64px);pointer-events:none}
     .roster-corner,.roster-head{display:grid;place-items:center;background:#202521;border-right:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--gold2);font-family:"Songti SC",serif;font-size:16px;position:sticky;top:0;z-index:4}
     .roster-corner{grid-column:1;grid-row:1;left:0;z-index:6;font-family:inherit;font-size:12px;color:var(--muted)}
@@ -112,7 +112,7 @@
       <div class="panel-head"><h2>游戏日与方案</h2><small>每日本地时间 08:00 切换游戏日</small></div>
       <div class="control-panel">
         <div class="control"><label for="gameDate">查看 / 补打卡日期</label><input id="gameDate" type="date"></div>
-        <div class="control"><label for="templateSelect">当日远征模板</label><select id="templateSelect"><option value="sprint70">70w冲刺</option><option value="daily">100w冲刺</option></select></div>
+        <div class="control"><label for="templateSelect">当日远征模板</label><select id="templateSelect"><option value="sprint70">70w冲刺</option><option value="daily">100w冲刺</option><option value="koban">小判远征</option></select></div>
         <div class="control"><label for="targetSelect">资源目标</label><select id="targetSelect"><option value="700000">70 万</option><option value="850000">85 万</option><option value="1000000">100 万</option></select></div>
         <div class="control"><label for="dailySetting">日课（每项资源）</label><input id="dailySetting" type="number" min="0" step="1"></div>
         <div class="control"><label for="monthlySetting">月卡（每项资源）</label><input id="monthlySetting" type="number" min="0" step="1"></div>
@@ -131,7 +131,7 @@
       <section class="panel">
         <div class="panel-head"><h2>每日刷花</h2><small id="flowerMeta">最低刀种需求 · 合计 17 把</small></div>
         <div class="flower">
-          <div class="flower-row"><div class="flower-item"><span>太刀</span><strong>2</strong></div><div class="flower-item"><span>大太刀</span><strong>1</strong></div><div class="flower-item"><span>自由刀种</span><strong id="flowerFree">14</strong></div><div class="flower-item"><span>合计</span><strong id="flowerTotal">17</strong></div></div>
+          <div class="flower-row"><div class="flower-item"><span id="flowerType1Name">太刀</span><strong id="flowerType1Value">2</strong></div><div class="flower-item"><span id="flowerType2Name">大太刀</span><strong id="flowerType2Value">1</strong></div><div class="flower-item"><span>自由刀种</span><strong id="flowerFree">14</strong></div><div class="flower-item"><span>合计</span><strong id="flowerTotal">17</strong></div></div>
           <div class="flower-total">至少需要：<b id="flowerNote">太刀 2 · 大太刀 1；其余 14 把可自由选择刀种</b></div>
         </div>
       </section>
@@ -164,13 +164,13 @@
     const BACKUP_KEY=`${STORAGE_KEY}-backup`;
     const resourceNames=['木炭','玉钢','冷却材','砥石'];
     const rewardMap={
-      '2-1':[0,0,135,135,200,0,0],'2-3':[180,0,180,0,0,1,0],
+      '2-1':[0,0,135,135,200,0,0],'2-2':[0,75,0,375,200,0,0],'2-3':[180,0,180,0,0,1,0],
       '3-1':[195,360,0,0,0,1,0],'3-2':[0,150,90,225,0,0,1],
       '3-3':[300,0,750,0,400,0,0],'3-4':[0,300,0,750,0,0,1],
       '4-1':[0,120,150,90,0,1,0],'4-2':[150,570,0,0,400,0,0],'4-3':[150,300,750,0,0,0,2],
-      '4-4':[225,0,0,600,700,0,0],'5-1':[375,375,375,0,0,0,2]
+      '4-4':[225,0,0,600,700,0,0],'5-1':[375,375,375,0,0,0,2],'5-3':[525,300,150,375,700,0,0]
     };
-    const times=['08','10','11','12','14','16','17','18','20','21:30','22','次日03','次日04','次日05:30','次日06','次日08'];
+    const times=['08','09:30','10','11','11:30','12','12:30','13','14','15:30','16','17','18','18:30','19','20','21:30','22','次日01','次日03','次日04','次日05:30','次日06','次日08'];
     const dailyTeams=[
       {name:'队 1',slots:{'08':['2-3','太刀A','exp-001'],'10':['2-3','太刀A','exp-005'],'12':['2-3','太刀A','exp-007'],'14':['2-3','太刀A','exp-009'],'16':['2-3','太刀B','exp-012'],'18':['5-1','太刀B + C + D','exp-015']},receives:{'08':'10','10':'12','12':'14','14':'16','16':'18','18':'次日06'}},
       {name:'队 2',slots:{'08':['3-1','A + B','exp-002'],'12':['3-1','A + B','exp-008'],'16':['4-1','A + B','exp-013'],'18':['4-3','A + B + C','exp-016']},receives:{'08':'12','12':'16','16':'18','18':'次日06'}},
@@ -185,15 +185,22 @@
       {name:'队 4',slots:{'08':['3-1','A + B','p70f-020'],'12':['4-4','A + B + C','p70f-021'],'18':['5-1','A + B + C','p70f-022']},receives:{'08':'12','12':'18','18':'次日06'}},
       {name:'队 5',slots:{'22':['4-4','A + B + C','p70f-023']},receives:{'22':'次日04'}}
     ];
-    const templates={sprint70:{name:'70w冲刺',teams:sprint70Teams},daily:{name:'100w冲刺',teams:dailyTeams},sprint85:{name:'85 万冲刺模板'},sprint100:{name:'100 万冲刺模板（旧占位）'}};
+    const kobanTeams=[
+      {name:'队 1',slots:{'08':['2-2','打刀A','koban-001'],'11':['2-2','打刀A','koban-002'],'14':['2-2','打刀A','koban-003'],'17':['5-3','薙刀B + 打刀A + C','koban-004']},receives:{'08':'11','11':'14','14':'17','17':'次日08'}},
+      {name:'队 2',slots:{'08':['2-1','A','koban-005'],'09:30':['2-1','A','koban-006'],'11':['2-1','A','koban-007'],'12:30':['2-1','A','koban-008'],'14':['2-1','B','koban-009'],'15:30':['2-1','B','koban-010'],'17':['2-1','B','koban-011'],'18:30':['2-1','B','koban-012'],'20':['2-1','C','koban-013'],'22':['2-2','打刀D','koban-014']},receives:{'08':'09:30','09:30':'11','11':'12:30','12:30':'14','14':'15:30','15:30':'17','17':'18:30','18:30':'20','20':'21:30','22':'次日01'}},
+      {name:'队 3',slots:{'08':['4-4','A + B + C','koban-015'],'14':['4-4','A + B + C','koban-016'],'20':['3-3','A + B','koban-017']},receives:{'08':'14','14':'20','20':'次日06'}},
+      {name:'队 4',slots:{'08':['4-2','A + B','koban-018'],'13':['4-2','A + B','koban-019'],'19':['2-2','打刀C','koban-020'],'22':['4-2','A + B','koban-021']},receives:{'08':'13','13':'18','19':'22','22':'次日03'}},
+      {name:'队 5',slots:{'22':['4-4','A + B + C','koban-022']},receives:{'22':'次日04'}}
+    ];
+    const templates={sprint70:{name:'70w冲刺',teams:sprint70Teams},daily:{name:'100w冲刺',teams:dailyTeams},koban:{name:'小判远征',teams:kobanTeams},sprint85:{name:'85 万冲刺模板'},sprint100:{name:'100 万冲刺模板（旧占位）'}};
     const legacyTaskIds={'08-1':'exp-001','08-2':'exp-002','08-3':'exp-003','08-4':'exp-004','10-1':'exp-005','11-3':'exp-006','12-1':'exp-007','12-2':'exp-008','14-1':'exp-009','14-3':'exp-010','14-4':'exp-011','16-1':'exp-012','16-2':'exp-013','17-3':'exp-014','18-1':'exp-015','18-2':'exp-016','20-3':'exp-017','20-4':'exp-018','21:30-3':'exp-019'};
-    const templateTaskIds={sprint70:new Set(sprint70Teams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),daily:new Set(dailyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),sprint85:new Set(),sprint100:new Set()};
-    const defaultState=()=>({version:6,baseline:[450000,460000,430000,480000],rewardAnchor:[0,0,0,0],target:700000,settings:{dailyPerResource:2050,monthlyPerResource:900},days:{}});
+    const templateTaskIds={sprint70:new Set(sprint70Teams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),daily:new Set(dailyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),koban:new Set(kobanTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),sprint85:new Set(),sprint100:new Set()};
+    const defaultState=()=>({version:7,baseline:[450000,460000,430000,480000],rewardAnchor:[0,0,0,0],target:700000,settings:{dailyPerResource:2050,monthlyPerResource:900},days:{}});
     const pad=n=>String(n).padStart(2,'0');
     const formatDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     function gameDay(date=new Date()){const d=new Date(date);if(d.getHours()<8)d.setDate(d.getDate()-1);return formatDate(d)}
     function validState(value){
-      if(!value||![2,3,4,5,6].includes(value.version)||!Array.isArray(value.baseline)||value.baseline.length!==4||!value.days||typeof value.days!=='object')throw new Error('备份格式不受支持');
+      if(!value||![2,3,4,5,6,7].includes(value.version)||!Array.isArray(value.baseline)||value.baseline.length!==4||!value.days||typeof value.days!=='object')throw new Error('备份格式不受支持');
       const baseline=value.baseline.map(Number);if(baseline.some(n=>!Number.isFinite(n)||n<0))throw new Error('库存基准无效');
       const target=Number(value.target);if(![700000,850000,1000000].includes(target))throw new Error('目标值无效');
       const settings=value.version>=4?value.settings:{dailyPerResource:2050,monthlyPerResource:900};
@@ -201,11 +208,11 @@
       const normalizedSettings={dailyPerResource:Number(settings.dailyPerResource),monthlyPerResource:Number(settings.monthlyPerResource)};
       const days={};Object.entries(value.days).forEach(([date,day])=>{const dayTemplate=day?.template==='sprint70Legacy'?'sprint70':day?.template;if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!day||!templates[dayTemplate])return;const source=day.checks&&typeof day.checks==='object'?day.checks:{daily:Array.isArray(day.checked)?day.checked:[]},checks={};Object.entries(source).forEach(([template,ids])=>{const checkTemplate=template==='sprint70Legacy'?'sprint70':template;if(!templates[checkTemplate]||!Array.isArray(ids))return;const migrated=ids.filter(x=>typeof x==='string').map(id=>value.version===2&&checkTemplate==='daily'?legacyTaskIds[id]:id).filter(id=>templateTaskIds[checkTemplate].has(id));checks[checkTemplate]=[...new Set([...(checks[checkTemplate]||[]),...migrated])]});const dailyAmount=value.version>=4?day.dailyAmount:(day.daily?2050:null),monthlyAmount=value.version>=4?day.monthlyAmount:(day.monthly?900:null),adjustments=value.version>=4?day.adjustments:[0,0,0,0];if(dailyAmount!==null&&(!Number.isInteger(Number(dailyAmount))||Number(dailyAmount)<0))throw new Error(`${date} 的日课快照无效`);if(monthlyAmount!==null&&(!Number.isInteger(Number(monthlyAmount))||Number(monthlyAmount)<0))throw new Error(`${date} 的月卡快照无效`);if(!Array.isArray(adjustments)||adjustments.length!==4||adjustments.some(n=>!Number.isInteger(Number(n))))throw new Error(`${date} 的额外收支无效`);days[date]={template:dayTemplate,checks,dailyAmount:dailyAmount===null?null:Number(dailyAmount),monthlyAmount:monthlyAmount===null?null:Number(monthlyAmount),adjustments:adjustments.map(Number)}});
       const rewardAnchor=Array.isArray(value.rewardAnchor)&&value.rewardAnchor.length===4?value.rewardAnchor.map(Number):[0,0,0,0];
-      return {version:6,baseline,rewardAnchor,target,settings:normalizedSettings,days};
+      return {version:7,baseline,rewardAnchor,target,settings:normalizedSettings,days};
     }
     let storageAvailable=true,state=defaultState(),migratedOnLoad=false;
     function setStatus(message,error=false){const el=document.querySelector('#status');el.textContent=message;el.style.color=error?'#e3a49a':''}
-    try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);state=validState(parsed);migratedOnLoad=parsed.version!==6}}catch(error){storageAvailable=false;setTimeout(()=>setStatus(`已使用安全默认值：${error.message}`,true))}
+    try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);state=validState(parsed);migratedOnLoad=parsed.version!==7}}catch(error){storageAvailable=false;setTimeout(()=>setStatus(`已使用安全默认值：${error.message}`,true))}
     let selectedDate=gameDay();
     function dayState(){const day=state.days[selectedDate]||(state.days[selectedDate]={template:'sprint70',checks:{sprint70:[]},dailyAmount:null,monthlyAmount:null,adjustments:[0,0,0,0]});if(!day.checks)day.checks={};if(!day.checks[day.template])day.checks[day.template]=[];if(!Array.isArray(day.adjustments))day.adjustments=[0,0,0,0];return day}
     function save({backup=true}={}){try{const current=localStorage.getItem(STORAGE_KEY);if(backup&&current)localStorage.setItem(BACKUP_KEY,current);localStorage.setItem(STORAGE_KEY,JSON.stringify(state));storageAvailable=true;setStatus('已保存在当前设备')}catch(error){storageAvailable=false;setStatus('无法写入本地存储，请立即导出 JSON 备份',true)}}
@@ -218,10 +225,11 @@
     const list=document.querySelector('#checklist'),roster=document.querySelector('#roster');
     function renderRoster(tasks,checked){
       const teams=templates[dayState().template].teams;if(!teams){roster.innerHTML='<div class="empty-template">该模板尚未定义，未生成任何远征。</div>';return}
+      const rosterTimes=times.filter(time=>time==='次日08'||tasks.some(task=>task.time===time||task.receive===time));
       const heads=teams.map((t,i)=>`<div class="roster-head" style="grid-column:${i+2};grid-row:1">${t.name}</div>`).join('');
-      const labels=times.slice(0,-1).map((t,i)=>`<div class="roster-time ${t.startsWith('次日')?'overnight':''}" style="grid-row:${i+2}">${showTime(t)}</div>`).join('')+`<div class="roster-time next" style="grid-row:${times.length}">次日 08:00</div>`;
-      const blocks=tasks.map(t=>{const start=times.indexOf(t.time),end=times.indexOf(t.receive),done=checked.has(t.id),overnight=t.receive.startsWith('次日')?`<small>${showTime(t.receive)} 返回</small>`:'';return `<div class="roster-block team-${t.teamIndex+1} ${done?'done':''}" data-task="${t.id}" role="checkbox" aria-checked="${done}" tabindex="0" style="grid-column:${t.teamIndex+2};grid-row:${start+2}/${end+2}"><b>${t.mission}</b><span>${t.members}</span>${overnight}</div>`}).join('');
-      const waits=teams.map((team,teamIndex)=>{const last=[...times].reverse().find(t=>team.slots[t]),receive=team.receives[last],start=times.indexOf(receive);return `<div class="roster-wait" style="grid-column:${teamIndex+2};grid-row:${start+2}/${times.length+1}">${showTime(receive)} 返回待收<br>空余至次日 08:00</div>`}).join('');
+      const labels=rosterTimes.map((t,i)=>`<div class="roster-time ${t.startsWith('次日')?'overnight':''} ${t==='次日08'?'next':''}" style="grid-row:${i+2}">${showTime(t)}</div>`).join('');
+      const blocks=tasks.map(t=>{const start=rosterTimes.indexOf(t.time),end=rosterTimes.indexOf(t.receive),done=checked.has(t.id),overnight=t.receive.startsWith('次日')?`<small>${showTime(t.receive)} 返回</small>`:'';return `<div class="roster-block team-${t.teamIndex+1} ${done?'done':''}" data-task="${t.id}" role="checkbox" aria-checked="${done}" tabindex="0" style="grid-column:${t.teamIndex+2};grid-row:${start+2}/${end+2}"><b>${t.mission}</b><span>${t.members}</span>${overnight}</div>`}).join('');
+      const waits=teams.map((team,teamIndex)=>{const last=[...times].reverse().find(t=>team.slots[t]),receive=team.receives[last],start=rosterTimes.indexOf(receive);return receive==='次日08'?'':`<div class="roster-wait" style="grid-column:${teamIndex+2};grid-row:${start+2}/${rosterTimes.length+1}">${showTime(receive)} 返回待收<br>空余至次日 08:00</div>`}).join('');
       roster.innerHTML=`<div class="roster-corner">时间</div>${heads}${labels}${blocks}${waits}`;
     }
     function renderStocks(){
@@ -233,7 +241,7 @@
       const day=dayState(),tasks=buildTasks(day.template),valid=new Set(tasks.map(t=>t.id));day.checks[day.template]=day.checks[day.template].filter(id=>valid.has(id));const checked=new Set(day.checks[day.template]);
       const templateSelect=document.querySelector('#templateSelect');
       document.querySelector('#gameDate').value=selectedDate;document.querySelector('#gameDate').max=gameDay();templateSelect.value=day.template;document.querySelector('#targetSelect').value=String(state.target);
-      const flower=day.template==='sprint70'?{total:15,free:12,note:'太刀 2 · 大太刀 1；其余 12 把可自由选择刀种'}:{total:17,free:14,note:'太刀 2 · 大太刀 1；其余 14 把可自由选择刀种'};document.querySelector('#flowerMeta').textContent=`最低刀种需求 · 合计 ${flower.total} 把`;document.querySelector('#flowerFree').textContent=flower.free;document.querySelector('#flowerTotal').textContent=flower.total;document.querySelector('#flowerNote').textContent=flower.note;
+      const flowers={sprint70:{types:[['太刀',2],['大太刀',1]],total:15,free:12,note:'太刀 2 · 大太刀 1；其余 12 把可自由选择刀种'},daily:{types:[['太刀',2],['大太刀',1]],total:17,free:14,note:'太刀 2 · 大太刀 1；其余 14 把可自由选择刀种'},koban:{types:[['打刀',2],['薙刀',1]],total:11,free:8,note:'打刀 2 · 薙刀 1；其余 8 把可自由选择刀种'}};const flower=flowers[day.template]||flowers.daily;document.querySelector('#flowerMeta').textContent=`最低刀种需求 · 合计 ${flower.total} 把`;document.querySelector('#flowerType1Name').textContent=flower.types[0][0];document.querySelector('#flowerType1Value').textContent=flower.types[0][1];document.querySelector('#flowerType2Name').textContent=flower.types[1][0];document.querySelector('#flowerType2Value').textContent=flower.types[1][1];document.querySelector('#flowerFree').textContent=flower.free;document.querySelector('#flowerTotal').textContent=flower.total;document.querySelector('#flowerNote').textContent=flower.note;
       document.querySelector('#dailySetting').value=state.settings.dailyPerResource;document.querySelector('#monthlySetting').value=state.settings.monthlyPerResource;
       document.querySelector('#dateLabel').textContent=`${selectedDate} · ${selectedDate===gameDay()?'当前游戏日':'历史补打卡'} · ${storageAvailable?'本地持久化':'未持久化'}`;
       const dailyDisplay=day.dailyAmount??state.settings.dailyPerResource,monthlyDisplay=day.monthlyAmount??state.settings.monthlyPerResource;
@@ -252,7 +260,7 @@
     document.querySelector('#templateSelect').addEventListener('change',e=>{dayState().template=e.target.value;save();render()});document.querySelector('#targetSelect').addEventListener('change',e=>{state.target=Number(e.target.value);save();render()});
     ['dailySetting','monthlySetting'].forEach((id,index)=>document.querySelector(`#${id}`).addEventListener('change',e=>{const value=Number(e.target.value);if(Number.isInteger(value)&&value>=0){state.settings[index===0?'dailyPerResource':'monthlyPerResource']=value;save();render()}else{setStatus('日课和月卡标准必须是非负整数',true);render()}}));
     document.querySelector('#stocks').addEventListener('change',e=>{if(!e.target.matches('[data-baseline]'))return;const value=Number(e.target.value),index=Number(e.target.dataset.baseline),gained=allReward();if(Number.isFinite(value)&&value>=0){state.baseline[index]=Math.round(value);state.rewardAnchor[index]=gained[index];save();render()}else{setStatus('当前库存必须是非负整数',true);render()}});
-    document.querySelector('#reset').addEventListener('click',()=>{if(confirm(`确定清除 ${selectedDate} 的全部打卡、日课、月卡和额外收支吗？`)){const day=dayState();day.checks={sprint70:[],daily:[]};day.dailyAmount=null;day.monthlyAmount=null;day.adjustments=[0,0,0,0];save();render()}});
+    document.querySelector('#reset').addEventListener('click',()=>{if(confirm(`确定清除 ${selectedDate} 的全部打卡、日课、月卡和额外收支吗？`)){const day=dayState();day.checks={sprint70:[],daily:[],koban:[]};day.dailyAmount=null;day.monthlyAmount=null;day.adjustments=[0,0,0,0];save();render()}});
     document.querySelector('#exportButton').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`刀剑乱舞-远征看板备份-${gameDay()}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);setStatus('已导出 JSON 备份')});
     document.querySelector('#importButton').addEventListener('click',()=>document.querySelector('#importFile').click());document.querySelector('#importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const next=validState(JSON.parse(await file.text()));try{const current=localStorage.getItem(STORAGE_KEY);if(current)localStorage.setItem(BACKUP_KEY,current)}catch(_){}state=next;save({backup:false});selectedDate=gameDay();render();setStatus('备份导入成功')}catch(error){setStatus(`导入失败：${error.message}，原数据未改动`,true)}finally{e.target.value=''}});
     document.querySelector('#restoreButton').addEventListener('click',()=>{try{const raw=localStorage.getItem(BACKUP_KEY);if(!raw)throw new Error('没有可恢复的备份');const previous=validState(JSON.parse(raw)),current=localStorage.getItem(STORAGE_KEY);state=previous;if(current)localStorage.setItem(BACKUP_KEY,current);save({backup:false});render();setStatus('已恢复上次备份')}catch(error){setStatus(`恢复失败：${error.message}`,true)}});
