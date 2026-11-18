@@ -204,12 +204,12 @@
     const templateTaskIds={sprint70:new Set(sprint70Teams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),daily:new Set(dailyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),kobanExtreme:new Set(kobanExtremeTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),kobanLegacy:new Set(kobanLegacyTeams.flatMap(team=>Object.values(team.slots).map(slot=>slot[2]))),sprint85:new Set(),sprint100:new Set()};
     const selectableTemplates=new Set(['sprint70','daily','kobanExtreme']);
     const templateDayStart={sprint70:480,daily:480,kobanExtreme:450,kobanLegacy:480,sprint85:480,sprint100:480};
-    const defaultState=()=>({version:8,activeTemplate:'sprint70',baseline:[450000,460000,430000,480000],rewardAnchor:[0,0,0,0],target:700000,settings:{dailyPerResource:2050,monthlyPerResource:900},days:{}});
+    const defaultState=()=>({version:9,activeTemplate:'sprint70',baseline:[450000,460000,430000,480000],rewardAnchor:[0,0,0,0],target:700000,settings:{dailyPerResource:2050,monthlyPerResource:900},days:{}});
     const pad=n=>String(n).padStart(2,'0');
     const formatDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     function gameDay(date=new Date(),templateId='sprint70'){const d=new Date(date),start=templateDayStart[templateId]??480;if(d.getHours()*60+d.getMinutes()<start)d.setDate(d.getDate()-1);return formatDate(d)}
     function validState(value){
-      if(!value||![2,3,4,5,6,7,8].includes(value.version)||!Array.isArray(value.baseline)||value.baseline.length!==4||!value.days||typeof value.days!=='object')throw new Error('备份格式不受支持');
+      if(!value||![2,3,4,5,6,7,8,9].includes(value.version)||!Array.isArray(value.baseline)||value.baseline.length!==4||!value.days||typeof value.days!=='object')throw new Error('备份格式不受支持');
       const baseline=value.baseline.map(Number);if(baseline.some(n=>!Number.isFinite(n)||n<0))throw new Error('库存基准无效');
       const target=Number(value.target);if(![700000,850000,1000000].includes(target))throw new Error('目标值无效');
       const settings=value.version>=4?value.settings:{dailyPerResource:2050,monthlyPerResource:900};
@@ -227,8 +227,9 @@
           const migrated=ids.filter(x=>typeof x==='string').map(id=>value.version===2&&checkTemplate==='daily'?legacyTaskIds[id]:id).filter(id=>templateTaskIds[checkTemplate].has(id));
           checks[checkTemplate]=[...new Set([...(checks[checkTemplate]||[]),...migrated])];
         });
-        if(value.version<8&&rawTemplate==='koban'&&!(checks.kobanLegacy||[]).length)dayTemplate='kobanExtreme';
-        const dailyAmount=value.version>=4?day.dailyAmount:(day.daily?2050:null),monthlyAmount=value.version>=4?day.monthlyAmount:(day.monthly?900:null),adjustments=value.version>=4?day.adjustments:[0,0,0,0],dayStartMinutes=value.version>=8?Number(day.dayStartMinutes):templateDayStart[dayTemplate];
+        const unusedOldKoban=(value.version<8&&rawTemplate==='koban')||(value.version===8&&rawTemplate==='kobanLegacy'),migratedToExtreme=unusedOldKoban&&!(checks.kobanLegacy||[]).length;
+        if(migratedToExtreme)dayTemplate='kobanExtreme';
+        const dailyAmount=value.version>=4?day.dailyAmount:(day.daily?2050:null),monthlyAmount=value.version>=4?day.monthlyAmount:(day.monthly?900:null),adjustments=value.version>=4?day.adjustments:[0,0,0,0],dayStartMinutes=migratedToExtreme?450:(value.version>=8?Number(day.dayStartMinutes):templateDayStart[dayTemplate]);
         if(dailyAmount!==null&&(!Number.isInteger(Number(dailyAmount))||Number(dailyAmount)<0))throw new Error(`${date} 的日课快照无效`);
         if(monthlyAmount!==null&&(!Number.isInteger(Number(monthlyAmount))||Number(monthlyAmount)<0))throw new Error(`${date} 的月卡快照无效`);
         if(!Array.isArray(adjustments)||adjustments.length!==4||adjustments.some(n=>!Number.isInteger(Number(n))))throw new Error(`${date} 的额外收支无效`);
@@ -236,12 +237,12 @@
         days[date]={template:dayTemplate,checks,dailyAmount:dailyAmount===null?null:Number(dailyAmount),monthlyAmount:monthlyAmount===null?null:Number(monthlyAmount),adjustments:adjustments.map(Number),dayStartMinutes};
       });
       const rewardAnchor=Array.isArray(value.rewardAnchor)&&value.rewardAnchor.length===4?value.rewardAnchor.map(Number):[0,0,0,0];
-      const inferredTemplate=days[gameDay(new Date(),'sprint70')]?.template,activeTemplate=selectableTemplates.has(value.activeTemplate)?value.activeTemplate:(selectableTemplates.has(inferredTemplate)?inferredTemplate:'sprint70');
-      return {version:8,activeTemplate,baseline,rewardAnchor,target,settings:normalizedSettings,days};
+      const inferredTemplate=days[gameDay(new Date(),'sprint70')]?.template,activeTemplate=value.version<9&&inferredTemplate==='kobanExtreme'?'kobanExtreme':(selectableTemplates.has(value.activeTemplate)?value.activeTemplate:(selectableTemplates.has(inferredTemplate)?inferredTemplate:'sprint70'));
+      return {version:9,activeTemplate,baseline,rewardAnchor,target,settings:normalizedSettings,days};
     }
     let storageAvailable=true,state=defaultState(),migratedOnLoad=false;
     function setStatus(message,error=false){const el=document.querySelector('#status');el.textContent=message;el.style.color=error?'#e3a49a':''}
-    try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);state=validState(parsed);migratedOnLoad=parsed.version!==8}}catch(error){storageAvailable=false;setTimeout(()=>setStatus(`已使用安全默认值：${error.message}`,true))}
+    try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);state=validState(parsed);migratedOnLoad=parsed.version!==9}}catch(error){storageAvailable=false;setTimeout(()=>setStatus(`已使用安全默认值：${error.message}`,true))}
     const currentGameDay=()=>gameDay(new Date(),state.activeTemplate);
     let selectedDate=currentGameDay();
     function dayState(){const day=state.days[selectedDate]||(state.days[selectedDate]={template:state.activeTemplate,checks:{[state.activeTemplate]:[]},dailyAmount:null,monthlyAmount:null,adjustments:[0,0,0,0],dayStartMinutes:templateDayStart[state.activeTemplate]});if(!day.checks)day.checks={};if(!day.checks[day.template])day.checks[day.template]=[];if(!Array.isArray(day.adjustments))day.adjustments=[0,0,0,0];if(![450,480].includes(day.dayStartMinutes))day.dayStartMinutes=templateDayStart[day.template]??480;return day}
