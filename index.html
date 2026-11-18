@@ -215,9 +215,28 @@
       const settings=value.version>=4?value.settings:{dailyPerResource:2050,monthlyPerResource:900};
       if(!settings||![settings.dailyPerResource,settings.monthlyPerResource].every(n=>Number.isInteger(Number(n))&&Number(n)>=0))throw new Error('日课或月卡配置无效');
       const normalizedSettings={dailyPerResource:Number(settings.dailyPerResource),monthlyPerResource:Number(settings.monthlyPerResource)};
-      const days={};Object.entries(value.days).forEach(([date,day])=>{const rawTemplate=day?.template==='sprint70Legacy'?'sprint70':day?.template,dayTemplate=rawTemplate==='koban'?'kobanLegacy':rawTemplate;if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!day||!templates[dayTemplate])return;const source=day.checks&&typeof day.checks==='object'?day.checks:{daily:Array.isArray(day.checked)?day.checked:[]},checks={};Object.entries(source).forEach(([template,ids])=>{const rawCheckTemplate=template==='sprint70Legacy'?'sprint70':template,checkTemplate=rawCheckTemplate==='koban'?'kobanLegacy':rawCheckTemplate;if(!templates[checkTemplate]||!Array.isArray(ids))return;const migrated=ids.filter(x=>typeof x==='string').map(id=>value.version===2&&checkTemplate==='daily'?legacyTaskIds[id]:id).filter(id=>templateTaskIds[checkTemplate].has(id));checks[checkTemplate]=[...new Set([...(checks[checkTemplate]||[]),...migrated])]});const dailyAmount=value.version>=4?day.dailyAmount:(day.daily?2050:null),monthlyAmount=value.version>=4?day.monthlyAmount:(day.monthly?900:null),adjustments=value.version>=4?day.adjustments:[0,0,0,0],dayStartMinutes=value.version>=8?Number(day.dayStartMinutes):templateDayStart[dayTemplate];if(dailyAmount!==null&&(!Number.isInteger(Number(dailyAmount))||Number(dailyAmount)<0))throw new Error(`${date} 的日课快照无效`);if(monthlyAmount!==null&&(!Number.isInteger(Number(monthlyAmount))||Number(monthlyAmount)<0))throw new Error(`${date} 的月卡快照无效`);if(!Array.isArray(adjustments)||adjustments.length!==4||adjustments.some(n=>!Number.isInteger(Number(n))))throw new Error(`${date} 的额外收支无效`);if(![450,480].includes(dayStartMinutes))throw new Error(`${date} 的统计日开始时间无效`);days[date]={template:dayTemplate,checks,dailyAmount:dailyAmount===null?null:Number(dailyAmount),monthlyAmount:monthlyAmount===null?null:Number(monthlyAmount),adjustments:adjustments.map(Number),dayStartMinutes}});
+      const days={};
+      Object.entries(value.days).forEach(([date,day])=>{
+        const rawTemplate=day?.template==='sprint70Legacy'?'sprint70':day?.template;
+        let dayTemplate=rawTemplate==='koban'?'kobanLegacy':rawTemplate;
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!day||!templates[dayTemplate])return;
+        const source=day.checks&&typeof day.checks==='object'?day.checks:{daily:Array.isArray(day.checked)?day.checked:[]},checks={};
+        Object.entries(source).forEach(([template,ids])=>{
+          const rawCheckTemplate=template==='sprint70Legacy'?'sprint70':template,checkTemplate=rawCheckTemplate==='koban'?'kobanLegacy':rawCheckTemplate;
+          if(!templates[checkTemplate]||!Array.isArray(ids))return;
+          const migrated=ids.filter(x=>typeof x==='string').map(id=>value.version===2&&checkTemplate==='daily'?legacyTaskIds[id]:id).filter(id=>templateTaskIds[checkTemplate].has(id));
+          checks[checkTemplate]=[...new Set([...(checks[checkTemplate]||[]),...migrated])];
+        });
+        if(value.version<8&&rawTemplate==='koban'&&!(checks.kobanLegacy||[]).length)dayTemplate='kobanExtreme';
+        const dailyAmount=value.version>=4?day.dailyAmount:(day.daily?2050:null),monthlyAmount=value.version>=4?day.monthlyAmount:(day.monthly?900:null),adjustments=value.version>=4?day.adjustments:[0,0,0,0],dayStartMinutes=value.version>=8?Number(day.dayStartMinutes):templateDayStart[dayTemplate];
+        if(dailyAmount!==null&&(!Number.isInteger(Number(dailyAmount))||Number(dailyAmount)<0))throw new Error(`${date} 的日课快照无效`);
+        if(monthlyAmount!==null&&(!Number.isInteger(Number(monthlyAmount))||Number(monthlyAmount)<0))throw new Error(`${date} 的月卡快照无效`);
+        if(!Array.isArray(adjustments)||adjustments.length!==4||adjustments.some(n=>!Number.isInteger(Number(n))))throw new Error(`${date} 的额外收支无效`);
+        if(![450,480].includes(dayStartMinutes))throw new Error(`${date} 的统计日开始时间无效`);
+        days[date]={template:dayTemplate,checks,dailyAmount:dailyAmount===null?null:Number(dailyAmount),monthlyAmount:monthlyAmount===null?null:Number(monthlyAmount),adjustments:adjustments.map(Number),dayStartMinutes};
+      });
       const rewardAnchor=Array.isArray(value.rewardAnchor)&&value.rewardAnchor.length===4?value.rewardAnchor.map(Number):[0,0,0,0];
-      const activeTemplate=selectableTemplates.has(value.activeTemplate)?value.activeTemplate:'sprint70';
+      const inferredTemplate=days[gameDay(new Date(),'sprint70')]?.template,activeTemplate=selectableTemplates.has(value.activeTemplate)?value.activeTemplate:(selectableTemplates.has(inferredTemplate)?inferredTemplate:'sprint70');
       return {version:8,activeTemplate,baseline,rewardAnchor,target,settings:normalizedSettings,days};
     }
     let storageAvailable=true,state=defaultState(),migratedOnLoad=false;
